@@ -1,5 +1,6 @@
 from crypto_lob_micro_move.datamodules.lob_dm import LOBDataModule
 from crypto_lob_micro_move.models.tcn_module import SimpleTCN
+from crypto_lob_micro_move.data.download import download_data
 import torch
 
 
@@ -15,7 +16,7 @@ def test_datamodule_raises_for_missing_data(tmp_path):
 
 def test_lightning_step_no_nan(tmp_path):
     data_dir = tmp_path / "data"
-    data_dir.mkdir()
+    download_data(str(data_dir))
     dm = LOBDataModule(str(data_dir))
     dm.setup()
     model = SimpleTCN()
