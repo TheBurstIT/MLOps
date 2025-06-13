@@ -1,0 +1,25 @@
+[project]
+name = "crypto-lob-micro-move"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Anonymous", email = "anon@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "torch",
+    "pytorch-lightning",
+    "hydra-core",
+    "torchmetrics",
+    "fire",
+    "onnxruntime",
+]
+
+[tool.poetry]
+packages = [{include = "crypto_lob_micro_move", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
