@@ -1,49 +1,55 @@
 # Crypto LOB Micro Move Classifier
 
-This repository provides a small project for limit order book
-classification. It includes a dataset downloader and a stub training
-routine.
+## Overview
 
-## Usage
+A minimal example project for classifying limit order book (LOB) micro moves.
+The repository includes a dataset downloader, a stub training routine and a few
+utilities for preparing models for production.
+
+## Setup
+
+Install dependencies using [Poetry](https://python-poetry.org/):
 
 ```bash
-# download dataset (requires kagglehub credentials)
-python -m crypto_lob_micro_move.cli download-data --output_dir data/raw
-
-# run a simple training loop
-python -m crypto_lob_micro_move.cli train --data_dir data/raw --epochs 1
+poetry install
 ```
 
-## DVC Usage
-
-This project uses [DVC](https://dvc.org) to version large datasets. After cloning the repository run:
+This project uses [DVC](https://dvc.org) to manage large files. After cloning run:
 
 ```bash
 dvc init
 dvc remote add -d storage s3://example-bucket/dvc-storage
 ```
 
-To download data that was previously pushed to the remote storage:
+If you use [MLflow](https://mlflow.org) for experiment tracking set your tracking
+URI (optional):
 
 ```bash
-dvc pull
+export MLFLOW_TRACKING_URI=http://localhost:5000
 ```
 
-After adding or modifying data tracked by DVC, upload it with:
+## Train
+
+Download the dataset (requires `kagglehub` credentials) and run the training loop:
 
 ```bash
-dvc push
+python -m crypto_lob_micro_move.cli download-data --output_dir data/raw
+python -m crypto_lob_micro_move.cli train --data_dir data/raw --epochs 1
 ```
 
-## Triton Inference Server
+Data is expected under `data/raw`.
 
-Convert your ONNX model to TensorRT before serving:
+## Production preparation
+
+Convert the trained ONNX model to TensorRT before serving:
 
 ```bash
-python -m crypto_lob_micro_move.cli onnx2trt path/to/model.onnx path/to/model.plan
+python -m crypto_lob_micro_move.cli onnx2trt path/to/model.onnx docker/triton/models/micro_move/1/model.plan
 ```
 
-Run Triton using the provided model repository:
+## Infer
+
+Start Triton using the provided model repository:
 
 ```bash
 docker run --rm -p8000:8000 -p8001:8001 -p8002:8002 \
@@ -58,4 +64,3 @@ curl -X POST -H 'Content-Type: application/json' \
     -d '{"inputs":[{"name":"input","shape":[1],"datatype":"FP32","data":[0.0]}]}' \
     http://localhost:8000/v2/models/micro_move/infer
 ```
-
