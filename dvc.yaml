@@ -3,3 +3,9 @@ stages:
     cmd: python -m crypto_lob_micro_move.data.download --output data/raw
     outs:
       - data/raw
+  train:
+    cmd: python -m crypto_lob_micro_move.train
+    deps:
+      - data/raw
+    outs:
+      - model.json

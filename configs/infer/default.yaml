@@ -1,0 +1,2 @@
+checkpoint_path: model.json
+device: cpu

@@ -1,7 +1,9 @@
 # Crypto LOB Micro Move Classifier
 
 This repository shows a minimal setup for limit order book classification using
-small NumPy utilities.
+simple utilities. Configuration files in `configs/` follow the Hydra layout so
+parameters can be overridden from the command line.
+Data retrieval and training are described as DVC stages.
 
 ## Usage
 
@@ -10,7 +12,10 @@ small NumPy utilities.
 python -m crypto_lob_micro_move.cli download-data --output_dir data/raw
 
 # run training with default settings
-python -m crypto_lob_micro_move.cli train data.path=data/raw epochs=1
+python -m crypto_lob_micro_move.cli train
+
+# override parameters
+python -m crypto_lob_micro_move.cli train epochs=2 data.path=data/raw
 
 # export trained checkpoint
 python -m crypto_lob_micro_move.export.onnx --ckpt model.json --out model.onnx
