@@ -34,10 +34,10 @@ Download the dataset (requires `kagglehub` credentials) and run the training loo
 
 ```bash
 python -m crypto_lob_micro_move.cli download-data --output_dir data/raw
-python -m crypto_lob_micro_move.cli train --data_dir data/raw --epochs 1
+python -m crypto_lob_micro_move.cli train --data_dir data/raw --dataset btc --epochs 1
 ```
 
-Data is expected under `data/raw`.
+Data is expected under `data/raw/<dataset>` where `<dataset>` can be `btc`, `eth` or `ada`.
 
 ## Production preparation
 
