@@ -1,8 +1,8 @@
 # Crypto LOB Micro Move Classifier
 
-This repository contains a minimal skeleton for a project that trains a
-classifier on limit order book data. It currently implements a simple
-placeholder data download step and provides a Fire-based CLI.
+This repository provides a small project for limit order book
+classification. The current version focuses on downloading the dataset
+and exposes a simple command-line interface.
 
 ## Usage
 
