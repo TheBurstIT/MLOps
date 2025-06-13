@@ -34,3 +34,28 @@ After adding or modifying data tracked by DVC, upload it with:
 ```bash
 dvc push
 ```
+
+## Triton Inference Server
+
+Convert your ONNX model to TensorRT before serving:
+
+```bash
+python -m crypto_lob_micro_move.cli onnx2trt path/to/model.onnx path/to/model.plan
+```
+
+Run Triton using the provided model repository:
+
+```bash
+docker run --rm -p8000:8000 -p8001:8001 -p8002:8002 \
+    -v $(pwd)/docker/triton/models:/models \
+    nvcr.io/nvidia/tritonserver:23.05-py3 tritonserver --model-repository=/models
+```
+
+Send a sample request:
+
+```bash
+curl -X POST -H 'Content-Type: application/json' \
+    -d '{"inputs":[{"name":"input","shape":[1],"datatype":"FP32","data":[0.0]}]}' \
+    http://localhost:8000/v2/models/micro_move/infer
+```
+
