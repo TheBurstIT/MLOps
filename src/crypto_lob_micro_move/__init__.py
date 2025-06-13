@@ -1,8 +1,6 @@
-try:
+try:  # pragma: no cover - CLI may rely on optional deps
     from .cli import main
-except Exception:  # pragma: no cover - optional dependency
+except Exception:
     main = None
 
-from .train import run_train
-
-__all__ = ["main", "run_train"]
+__all__ = ["main"]

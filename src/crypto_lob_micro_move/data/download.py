@@ -1,5 +1,6 @@
 from pathlib import Path
-import numpy as np
+import csv
+import random
 
 def _try_kaggle_download() -> Path | None:
     """Attempt to download the dataset via kagglehub."""
@@ -26,14 +27,16 @@ def download_data(output_dir: str = "data/raw") -> Path:
         return dataset_path
 
     file_path = out_path / "sample.csv"
-    # generate small synthetic dataset: each row has window*30 features followed
-    # by a label column
     num_samples = 10
-    window = 10
-    data = np.random.randn(num_samples, window * 30)
-    labels = np.random.randint(0, 3, size=(num_samples, 1))
-    full = np.concatenate([data, labels], axis=1)
-    np.savetxt(file_path, full, delimiter=",")
+    features = 30
+    rows = []
+    for _ in range(num_samples):
+        row = [random.gauss(0, 1) for _ in range(features)]
+        row.append(random.randint(0, 2))
+        rows.append(row)
+    with open(file_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerows(rows)
     print(f"Data saved to {file_path}")
     return file_path
 

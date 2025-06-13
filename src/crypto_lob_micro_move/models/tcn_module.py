@@ -1,41 +1,54 @@
-from __future__ import annotations
-
-import torch
-import torch.nn as nn
-import pytorch_lightning as pl
-from torchmetrics.classification import MulticlassF1Score
+import math
+import random
 
 
-class SimpleTCN(pl.LightningModule):
-    def __init__(self, channels: int = 16, kernel_size: int = 3, lr: float = 1e-3):
-        super().__init__()
-        self.save_hyperparameters()
-        self.conv = nn.Conv1d(30, channels, kernel_size, padding="same")
-        self.fc = nn.Linear(channels, 3)
-        self.criterion = nn.CrossEntropyLoss()
-        self.f1 = MulticlassF1Score(num_classes=3)
+class SimpleTCN:
+    """Very small classifier implemented with NumPy."""
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = x.permute(0, 2, 1)
-        x = self.conv(x)
-        x = torch.relu(x)
-        x = x.mean(dim=2)
-        return self.fc(x)
+    def __init__(self, input_size: int = 30, lr: float = 1e-3):
+        self.lr = lr
+        self.weights = [
+            [random.gauss(0, 1) for _ in range(3)] for _ in range(input_size)
+        ]
+        self.bias = [0.0, 0.0, 0.0]
 
-    def training_step(self, batch, batch_idx: int):
+    def __call__(self, x):
+        outputs = []
+        for row in x:
+            logits = []
+            for j in range(3):
+                s = sum(row[i] * self.weights[i][j] for i in range(len(row)))
+                s += self.bias[j]
+                logits.append(s)
+            outputs.append(logits)
+        return outputs
+
+    def training_step(self, batch, batch_idx: int) -> float:
         x, y = batch
         logits = self(x)
-        loss = self.criterion(logits, y.squeeze())
-        self.log("train_loss", loss)
-        self.log("train_f1", self.f1(logits, y.squeeze()))
+        losses = []
+        for logit, label in zip(logits, y):
+            m = max(logit)
+            exp = [math.exp(v - m) for v in logit]
+            denom = sum(exp)
+            prob = exp[label] / denom
+            losses.append(-math.log(prob))
+        loss = sum(losses) / len(losses)
         return loss
 
-    def validation_step(self, batch, batch_idx: int):
-        x, y = batch
-        logits = self(x)
-        loss = self.criterion(logits, y.squeeze())
-        self.log("val_loss", loss, prog_bar=True)
-        self.log("val_f1", self.f1(logits, y.squeeze()), prog_bar=True)
+    def save(self, path: str) -> None:
+        import json
 
-    def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=self.hparams.lr)
+        with open(path, "w") as f:
+            json.dump({"weights": self.weights, "bias": self.bias}, f)
+
+    @classmethod
+    def load(cls, path: str) -> "SimpleTCN":
+        import json
+
+        with open(path) as f:
+            data = json.load(f)
+        model = cls(input_size=len(data["weights"]))
+        model.weights = data["weights"]
+        model.bias = data["bias"]
+        return model

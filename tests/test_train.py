@@ -1,7 +1,7 @@
 from crypto_lob_micro_move.datamodules.lob_dm import LOBDataModule
 from crypto_lob_micro_move.models.tcn_module import SimpleTCN
 from crypto_lob_micro_move.data.download import download_data
-import torch
+import math
 
 
 def test_datamodule_raises_for_missing_data(tmp_path):
@@ -14,12 +14,12 @@ def test_datamodule_raises_for_missing_data(tmp_path):
         assert False, "Expected FileNotFoundError"
 
 
-def test_lightning_step_no_nan(tmp_path):
+def test_training_step_no_nan(tmp_path):
     data_dir = tmp_path / "data"
     download_data(str(data_dir))
     dm = LOBDataModule(str(data_dir))
     dm.setup()
-    model = SimpleTCN()
+    model = SimpleTCN(input_size=len(dm.train_ds.x[0]))
     batch = next(iter(dm.train_dataloader()))
     loss = model.training_step(batch, 0)
-    assert torch.isfinite(loss).all()
+    assert math.isfinite(loss)

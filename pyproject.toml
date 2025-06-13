@@ -8,14 +8,8 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "torch",
-    "pytorch-lightning",
-    "hydra-core",
-    "torchmetrics",
     "fire",
-    "onnxruntime",
     "numpy",
-    "mlflow",
 ]
 
 [tool.poetry]

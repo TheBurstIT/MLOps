@@ -1,8 +1,7 @@
+from pathlib import Path
 from crypto_lob_micro_move.data import download
 from crypto_lob_micro_move import train as train_module
 from crypto_lob_micro_move.export.onnx import export_ckpt_to_onnx
-from pathlib import Path
-from hydra import compose, initialize_config_dir
 
 class Commands:
     def download_data(self, output_dir: str = "data/raw"):
@@ -11,9 +10,17 @@ class Commands:
 
     def train(self, **overrides):
         """Run training with optional config overrides."""
-        cfg_dir = Path(__file__).resolve().parents[2] / "configs"
-        with initialize_config_dir(str(cfg_dir)):
-            cfg = compose(config_name="train/default.yaml", overrides=[f"{k}={v}" for k, v in overrides.items()])
+        cfg = {
+            'data': {'path': 'data/raw'},
+            'batch_size': 4,
+            'lr': 0.001,
+            'epochs': 1,
+        }
+        for k, v in overrides.items():
+            if k in cfg:
+                cfg[k] = type(cfg[k])(v)
+            elif k == "data.path":
+                cfg["data"]["path"] = v
         train_module.run_train(cfg)
 
     def export(self, ckpt: str, out: str):

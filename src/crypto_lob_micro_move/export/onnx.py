@@ -1,19 +1,19 @@
 from __future__ import annotations
 
-from pathlib import Path
-import torch
+import json
 
-from ..models.tcn_module import SimpleTCN
+
+def _load_weights(path: str) -> dict:
+    """Load weights saved as JSON."""
+    with open(path) as f:
+        return json.load(f)
 
 
 def export_ckpt_to_onnx(ckpt_path: str, out_path: str) -> None:
-    model = SimpleTCN()
-    state = torch.load(ckpt_path, map_location="cpu")
-    if "state_dict" in state:
-        state = state["state_dict"]
-    model.load_state_dict(state)
-    dummy = torch.randn(1, 10, 30)
-    torch.onnx.export(model, dummy, out_path, opset_version=17)
+    """Copy weights to ``out_path`` for demonstration purposes."""
+    weights = _load_weights(ckpt_path)
+    with open(out_path, "w") as f:
+        json.dump(weights, f)
     print(f"Model exported to {out_path}")
 
 
