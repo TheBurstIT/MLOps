@@ -33,10 +33,10 @@ export MLFLOW_TRACKING_URI=http://localhost:5000
 
 ```bash
 python -m crypto_lob_micro_move.cli download-data --output_dir data/raw
-python -m crypto_lob_micro_move.cli train --data_dir data/raw --epochs 1
+python -m crypto_lob_micro_move.cli train --data_dir data/raw --dataset btc --epochs 1
 ```
 
-Данные должны располагаться в каталоге `data/raw`.
+Данные должны располагаться в каталоге `data/raw/<dataset>`, где `<dataset>` может принимать значения `btc`, `eth` или `ada`.
 
 ## Подготовка к продакшену
 

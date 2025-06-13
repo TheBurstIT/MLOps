@@ -7,9 +7,10 @@ class Commands:
         """Download dataset."""
         download.download_data(output_dir)
 
-    def train(self, data_dir: str = "data/raw", epochs: int = 1):
+    def train(self, data_dir: str = "data/raw", dataset: str = "btc", epochs: int = 1):
         """Run a stub training routine."""
-        train_module.train(data_dir=data_dir, epochs=epochs)
+        cfg = train_module.TrainConfig(data_dir=data_dir, dataset=dataset, epochs=epochs)
+        train_module.train(cfg)
 
     def onnx2trt(self, input_model: str, output_model: str):
         """Convert an ONNX model to TensorRT."""
