@@ -14,6 +14,13 @@ Install dependencies using [Poetry](https://python-poetry.org/):
 poetry install
 ```
 
+If the CI environment is offline you can build the provided Docker image with
+all dependencies pre-installed:
+
+```bash
+docker build -t micro-move-dev -f docker/Dockerfile .
+```
+
 This project uses [DVC](https://dvc.org) to manage large files. After cloning run:
 
 ```bash
