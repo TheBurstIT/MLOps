@@ -1,13 +1,33 @@
+from __future__ import annotations
+
 from pathlib import Path
 
+import hydra
+from omegaconf import DictConfig
+import pytorch_lightning as pl
 
-def train(data_dir: str = "data/raw", epochs: int = 1) -> None:
-    """A stub training routine."""
-    data_path = Path(data_dir)
-    if not data_path.exists():
-        raise FileNotFoundError(data_path)
-    print(f"Training on {data_path} for {epochs} epochs")
+from .datamodules.lob_dm import LOBDataModule
+from .models.tcn_module import SimpleTCN
+
+
+CONFIG_PATH = Path(__file__).resolve().parents[2] / "configs"
+
+
+def run_train(cfg: DictConfig) -> None:
+    pl.seed_everything(cfg.seed)
+
+    dm = LOBDataModule(data_dir=cfg.data.path, batch_size=cfg.batch_size)
+
+    model = SimpleTCN(channels=cfg.model.channels, kernel_size=cfg.model.kernel_size, lr=cfg.lr)
+
+    trainer = pl.Trainer(max_epochs=cfg.epochs, log_every_n_steps=1)
+    trainer.fit(model, datamodule=dm)
+
+
+@hydra.main(config_path=str(CONFIG_PATH), config_name="train/default.yaml", version_base=None)
+def main(cfg: DictConfig) -> None:
+    run_train(cfg)
 
 
 if __name__ == "__main__":
-    train()
+    main()

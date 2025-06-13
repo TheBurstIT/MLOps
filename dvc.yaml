@@ -1,0 +1,5 @@
+stages:
+  download:
+    cmd: python -m crypto_lob_micro_move.data.download --output data/raw
+    outs:
+      - data/raw
